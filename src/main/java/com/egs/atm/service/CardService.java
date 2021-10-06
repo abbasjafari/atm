@@ -6,6 +6,7 @@ import com.egs.atm.service.mapper.CardMapper;
 import com.egs.atm.domain.Card;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class CardService {
     public CardDTO save(CardDTO cardDTO) {
         log.debug("Request to save Card : {}", cardDTO);
         Card card = cardMapper.toEntity(cardDTO);
+        card.setPin(new BCryptPasswordEncoder().encode(card.getPin()));
         card = cardRepository.save(card);
         CardDTO result = cardMapper.toDto(card);
         return result;

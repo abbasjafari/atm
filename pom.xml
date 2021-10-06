@@ -24,8 +24,8 @@
         <lombok.version>1.18.10</lombok.version>
         <zalando.version>0.25.2</zalando.version>
         <assertj.version>3.11.1</assertj.version>
-        <swagger.version>2.9.2</swagger.version>
-
+        <springfox.version>3.0.0</springfox.version>
+        <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
 
@@ -49,6 +49,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!--spring security and jwt-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+
 
 
         <!-- in-memory database  -->
@@ -98,13 +110,8 @@
         <!--   swagger   -->
         <dependency>
             <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>${springfox.version}</version>
         </dependency>
 
     </dependencies>
