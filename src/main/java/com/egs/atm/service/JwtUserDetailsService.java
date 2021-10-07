@@ -1,7 +1,8 @@
 package com.egs.atm.service;
 
-import com.egs.atm.domain.Card;
-import com.egs.atm.repository.CardRepository;
+import com.egs.atm.domain.Account;
+import com.egs.atm.repository.AccountRepository;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,10 +16,10 @@ import java.util.Optional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
-private final CardRepository cardRepository;
+private final AccountRepository accountRepository;
 
-    public JwtUserDetailsService(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
+    public JwtUserDetailsService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -28,10 +29,13 @@ private final CardRepository cardRepository;
             authority.add(new SimpleGrantedAuthority("admin"));
             return new User("admin","$2a$10$/1LwPVVOZVwyLwr4x3cKH.bpJFKtEZCCfepx8rOh/m0BSc2JUoXMm", authority);
         }
-        Optional<Card> cardOptional = cardRepository.findByCardNumber(username);
-        if(cardOptional.isPresent()){
-            Card card = cardOptional.get();
-            return new User(card.getCardNumber(),card.getPin(),
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(username);
+        if(accountOptional.isPresent()){
+            Account account = accountOptional.get();
+            if (account.getUnsuccessfulCount()>=3) {
+                throw new DisabledException("User is Disabled");
+            }
+            return new User(account.getAccountNumber(),account.getPin(),
                     new ArrayList<>());
         } else {
             throw new UsernameNotFoundException("User not found with username: " + username);

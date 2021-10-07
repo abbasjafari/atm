@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/v2/api-docs",
                 "/webjars/**").permitAll().and().
                 //admin path
-                        authorizeRequests().antMatchers("/api/cards/**").hasAuthority("admin").
+                        authorizeRequests().antMatchers("/api/accounts/**").hasAuthority("admin").
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
 
