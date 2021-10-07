@@ -23,9 +23,6 @@ public class AccountTransactionalResource {
     private final AccountService accountService;
 
 
-    @Value("${atm.clientApp.name}")
-    private String applicationName;
-
 
     public AccountTransactionalResource(AccountTransactionalService accountTransactionalService, AccountService accountService) {
         this.accountTransactionalService = accountTransactionalService;
