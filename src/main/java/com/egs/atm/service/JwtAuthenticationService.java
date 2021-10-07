@@ -3,6 +3,7 @@ package com.egs.atm.service;
 import com.egs.atm.config.JwtTokenUtil;
 import com.egs.atm.repository.AccountRepository;
 import com.egs.atm.service.dto.AccountDTO;
+import com.egs.atm.web.rest.errors.LogicAlertException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -45,13 +46,13 @@ public class JwtAuthenticationService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
             accountRepository.findByAccountNumber(username).ifPresent(account -> account.setUnsuccessfulCount(0));
         } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
+            throw new LogicAlertException("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             accountRepository.findByAccountNumber(username).ifPresent(account -> {
                 account.setUnsuccessfulCount(account.getUnsuccessfulCount() + 1);
                 accountRepository.save(account);
             });
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new LogicAlertException("INVALID_CREDENTIALS", e);
         }
     }
 }

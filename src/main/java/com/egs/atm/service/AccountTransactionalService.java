@@ -5,6 +5,8 @@ import com.egs.atm.domain.AccountTransaction;
 import com.egs.atm.domain.enumration.TransactionType;
 import com.egs.atm.repository.AccountRepository;
 import com.egs.atm.repository.AccountTransactionalRepository;
+import com.egs.atm.web.rest.errors.BadRequestAlertException;
+import com.egs.atm.web.rest.errors.LogicAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,7 +59,7 @@ public class AccountTransactionalService {
         Account account = accountService.findAccount();
         BigDecimal balance = calculateBalance(account);
         if (balance.compareTo(amount) < 0) {
-            throw new Exception("Amount is not enough");
+            throw new BadRequestAlertException("Amount is not enough","Account","notEnough");
         }
         AccountTransaction accountTransaction = new AccountTransaction()
                 .account(account)
@@ -89,7 +91,7 @@ public class AccountTransactionalService {
             AccountTransaction accountTransaction = account.getLastAccountTransaction();
             String hash = calculateHash(accountTransaction);
             if (!hash.equals(accountTransaction.getHashData()))
-                throw new Exception("Data is invalid");
+                throw new LogicAlertException("Data is invalid");
             else return accountTransaction.getBalance();
         } else return BigDecimal.ZERO;
     }
