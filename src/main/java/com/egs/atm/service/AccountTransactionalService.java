@@ -7,14 +7,13 @@ import com.egs.atm.repository.AccountRepository;
 import com.egs.atm.repository.AccountTransactionalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.bind.DatatypeConverter;
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 @Transactional
@@ -24,53 +23,86 @@ public class AccountTransactionalService {
 
     private final AccountTransactionalRepository accountTransactionalRepository;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
 
-    public AccountTransactionalService(AccountTransactionalRepository accountTransactionalRepository, AccountRepository accountRepository) {
+    public AccountTransactionalService(AccountTransactionalRepository accountTransactionalRepository, AccountRepository accountRepository, AccountService accountService) {
         this.accountTransactionalRepository = accountTransactionalRepository;
         this.accountRepository = accountRepository;
+        this.accountService = accountService;
     }
 
-    public BigDecimal depositAccount(BigDecimal amount) {
+    public BigDecimal depositAccount(BigDecimal amount) throws Exception {
+        log.debug("request to deposit account : "+ amount +" for card number : "+ accountService.findUsername());
+        Account account = accountService.findAccount();
+        BigDecimal balance = calculateBalance(account);
         AccountTransaction accountTransaction = new AccountTransaction()
-                .account(findAccount())
+                .account(account)
                 .amount(amount)
+                .balance(balance.add(amount))
+                .parentAccountTransaction(account.getLastAccountTransaction())
                 .transactionType(TransactionType.DEPOSIT);
         accountTransactionalRepository.save(accountTransaction);
+        accountTransaction.setHashData(calculateHash(accountTransaction));
+        accountTransactionalRepository.save(accountTransaction);
+        account.setLastAccountTransaction(accountTransaction);
+        accountRepository.save(account);
 
-        return checkBalance();
+        return accountTransaction.getBalance();
     }
 
     public BigDecimal withdrawalAccount(BigDecimal amount) throws Exception {
-        if (checkBalance().compareTo(amount) < 0) {
-            throw new Exception("");
+        log.debug("request to withdrawal account : "+ amount+" for card number : "+ accountService.findUsername());
+
+        Account account = accountService.findAccount();
+        BigDecimal balance = calculateBalance(account);
+        if (balance.compareTo(amount) < 0) {
+            throw new Exception("Amount is not enough");
         }
         AccountTransaction accountTransaction = new AccountTransaction()
-                .account(findAccount())
+                .account(account)
                 .amount(amount)
+                .balance(balance.subtract(amount))
+                .parentAccountTransaction(account.getLastAccountTransaction())
                 .transactionType(TransactionType.WITHDRAWAL);
         accountTransactionalRepository.save(accountTransaction);
+        accountTransaction.setHashData(calculateHash(accountTransaction));
+        accountTransactionalRepository.save(accountTransaction);
+        account.setLastAccountTransaction(accountTransaction);
+        accountRepository.save(account);
 
-        return checkBalance();
+        return accountTransaction.getBalance();
     }
 
-    public BigDecimal checkBalance() {
-        return accountTransactionalRepository.checkBalance(findAccount());
+    @Transactional(readOnly = true)
+    public BigDecimal checkBalance() throws Exception {
+        log.debug(" request to  check balance for card number : "+ accountService.findUsername());
+        Account account = accountService.findAccount();
+        return calculateBalance(account);
+
     }
 
 
-    private Account findAccount() {
-        String username;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-        Optional<Account> accountOptional = accountRepository.findByAccountNumber(username);
-        if (accountOptional.isPresent()) {
-            return accountOptional.get();
-        } else throw new UsernameNotFoundException("User not found with username: " + username);
+    private BigDecimal calculateBalance(Account account) throws Exception {
+        log.debug(" request to  calculate balance for card number : "+ accountService.findUsername());
+        if (account.getLastAccountTransaction() != null) {
+            AccountTransaction accountTransaction = account.getLastAccountTransaction();
+            String hash = calculateHash(accountTransaction);
+            if (!hash.equals(accountTransaction.getHashData()))
+                throw new Exception("Data is invalid");
+            else return accountTransaction.getBalance();
+        } else return BigDecimal.ZERO;
+    }
+
+
+
+    private String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
+        log.debug(" request to  calculate hash for card number : "+ accountService.findUsername());
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update((accountTransaction.toString() + accountTransaction.getLastAccountTransactionHash()).getBytes());
+        byte[] digest = md.digest();
+        return DatatypeConverter
+                .printHexBinary(digest).toUpperCase();
     }
 }
 

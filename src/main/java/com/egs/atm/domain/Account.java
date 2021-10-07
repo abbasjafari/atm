@@ -25,6 +25,12 @@ public class Account implements Serializable {
     @Column
     private Integer unsuccessfulCount=0;
 
+    @ManyToOne
+    private AccountTransaction lastAccountTransaction;
+
+    @Version
+    private Long version= 0L;
+
     public Account accountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
         return this;
@@ -36,6 +42,10 @@ public class Account implements Serializable {
     }
     public Account unsuccessfulCount(Integer unsuccessfulCount) {
         this.unsuccessfulCount = unsuccessfulCount;
+        return this;
+    }
+    public Account lastAccountTransaction(AccountTransaction lastAccountTransaction) {
+        this.lastAccountTransaction = lastAccountTransaction;
         return this;
     }
 

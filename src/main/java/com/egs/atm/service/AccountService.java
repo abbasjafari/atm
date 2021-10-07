@@ -6,6 +6,9 @@ import com.egs.atm.service.dto.AccountDTO;
 import com.egs.atm.service.mapper.AccountMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +64,26 @@ public class AccountService {
     public void delete(Long id) {
         log.debug("Request to delete Account : {}", id);
         accountRepository.deleteById(id);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Account findAccount() {
+        String username = findUsername();
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(username);
+        if (accountOptional.isPresent()) {
+            return accountOptional.get();
+        } else throw new UsernameNotFoundException("User not found with username: " + username);
+    }
+    public String findUsername(){
+        String username;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return username;
     }
 
 }

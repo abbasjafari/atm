@@ -22,15 +22,16 @@ public class AccountResource {
 
     private final Logger log = LoggerFactory.getLogger(AccountResource.class);
 
-    private static final String ENTITY_NAME = "atmAccount";
+    private static final String ENTITY_NAME = "Account";
 
     @Value("${atm.clientApp.name}")
     private String applicationName;
 
     private final AccountService accountService;
 
-    public AccountResource(AccountService accountService) {
+    public AccountResource(AccountService accountService) throws URISyntaxException {
         this.accountService = accountService;
+      createAccount(new AccountDTO().name("1111-1111-1111-1111").pin("1234"));
     }
 
     @PostMapping("/accounts")
