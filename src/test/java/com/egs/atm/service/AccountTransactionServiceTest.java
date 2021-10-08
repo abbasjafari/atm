@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest(classes = ATMApp.class)
+@ActiveProfiles("dev")
 public class AccountTransactionServiceTest {
     private static final String DEFAULT_CARD_NUMBER = "3333-3333-3333-3333";
     private static final String DEFAULT_PIN = "1234";
