@@ -1,8 +1,12 @@
 package com.egs.atm.service.dto;
 
+import com.egs.atm.domain.AccountTransaction;
 import lombok.Data;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -14,6 +18,10 @@ public class AccountDTO implements Serializable {
     private Long id;
     private String accountNumber;
     private String pin;
+    private Integer unsuccessfulCount;
+    private Long version;
+    private ZonedDateTime expiryTime;
+
 
     /**
      * set account number using builder pattern

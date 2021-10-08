@@ -50,6 +50,11 @@
             <scope>test</scope>
             <version>2.5.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!--spring security and jwt-->
         <dependency>
@@ -69,7 +74,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
-
+        <!--  mySql database-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
         <!-- assert -->
         <dependency>
             <groupId>org.assertj</groupId>

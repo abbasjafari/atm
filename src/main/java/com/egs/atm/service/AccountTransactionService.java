@@ -4,7 +4,7 @@ import com.egs.atm.domain.Account;
 import com.egs.atm.domain.AccountTransaction;
 import com.egs.atm.domain.enumration.TransactionType;
 import com.egs.atm.repository.AccountRepository;
-import com.egs.atm.repository.AccountTransactionalRepository;
+import com.egs.atm.repository.AccountTransactionRepository;
 import com.egs.atm.web.rest.errors.BadRequestAlertException;
 import com.egs.atm.web.rest.errors.LogicAlertException;
 import org.slf4j.Logger;
@@ -19,17 +19,17 @@ import java.security.NoSuchAlgorithmException;
 
 @Service
 @Transactional
-public class AccountTransactionalService {
+public class AccountTransactionService {
 
-    private final Logger log = LoggerFactory.getLogger(AccountTransactionalService.class);
+    private final Logger log = LoggerFactory.getLogger(AccountTransactionService.class);
 
-    private final AccountTransactionalRepository accountTransactionalRepository;
+    private final AccountTransactionRepository accountTransactionRepository;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
 
 
-    public AccountTransactionalService(AccountTransactionalRepository accountTransactionalRepository, AccountRepository accountRepository, AccountService accountService) {
-        this.accountTransactionalRepository = accountTransactionalRepository;
+    public AccountTransactionService(AccountTransactionRepository accountTransactionRepository, AccountRepository accountRepository, AccountService accountService) {
+        this.accountTransactionRepository = accountTransactionRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
     }
@@ -44,9 +44,9 @@ public class AccountTransactionalService {
                 .balance(balance.add(amount))
                 .parentAccountTransaction(account.getLastAccountTransaction())
                 .transactionType(TransactionType.DEPOSIT);
-        accountTransactionalRepository.save(accountTransaction);
+        accountTransactionRepository.save(accountTransaction);
         accountTransaction.setHashData(calculateHash(accountTransaction));
-        accountTransactionalRepository.save(accountTransaction);
+        accountTransactionRepository.save(accountTransaction);
         account.setLastAccountTransaction(accountTransaction);
         accountRepository.save(account);
 
@@ -70,9 +70,9 @@ public class AccountTransactionalService {
                 .balance(balance.subtract(amount))
                 .parentAccountTransaction(account.getLastAccountTransaction())
                 .transactionType(TransactionType.WITHDRAWAL);
-        accountTransactionalRepository.save(accountTransaction);
+        accountTransactionRepository.save(accountTransaction);
         accountTransaction.setHashData(calculateHash(accountTransaction));
-        accountTransactionalRepository.save(accountTransaction);
+        accountTransactionRepository.save(accountTransaction);
         account.setLastAccountTransaction(accountTransaction);
         accountRepository.save(account);
 
@@ -94,7 +94,7 @@ public class AccountTransactionalService {
      * calculating balance for current user
      * @throws LogicAlertException
      * */
-    private BigDecimal calculateBalance(Account account) throws Exception {
+    public BigDecimal calculateBalance(Account account) throws Exception {
         log.debug(" request to  calculate balance for card number : "+ account.getAccountNumber());
         if (account.getLastAccountTransaction() != null) {
             AccountTransaction accountTransaction = account.getLastAccountTransaction();
@@ -109,7 +109,7 @@ public class AccountTransactionalService {
      * calculating account transaction hash with md5 algorithm
      * see also {@link AccountTransaction}
      * */
-    private String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
+    public String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
         log.debug(" request to  calculate hash for card number : "+ accountTransaction.getAccount().getAccountNumber());
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update((accountTransaction.toString() + accountTransaction.getLastAccountTransactionHash()).getBytes());

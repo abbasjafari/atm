@@ -5,9 +5,7 @@ import com.egs.atm.domain.Account;
 import com.egs.atm.domain.AccountTransaction;
 import com.egs.atm.domain.enumration.TransactionType;
 import com.egs.atm.repository.AccountRepository;
-import com.egs.atm.repository.AccountTransactionalRepository;
-import com.egs.atm.service.dto.AccountDTO;
-import com.egs.atm.service.mapper.AccountMapper;
+import com.egs.atm.repository.AccountTransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +13,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest(classes = ATMApp.class)
 public class AccountTransactionServiceTest {
+    private static final String DEFAULT_CARD_NUMBER = "3333-3333-3333-3333";
+    private static final String DEFAULT_PIN = "1234";
 
 
     @Autowired
-    private AccountTransactionalService accountTransactionalService;
+    private AccountTransactionService accountTransactionService;
     @Autowired
-    private AccountTransactionalRepository accountTransactionalRepository;
+    private AccountTransactionRepository accountTransactionRepository;
     @Autowired
     private AccountRepository accountRepository;
 
@@ -39,11 +36,11 @@ public class AccountTransactionServiceTest {
 
 
     public Account createEntity() {
-        accountTransactionalRepository.deleteAll();
+        accountTransactionRepository.deleteAll();
         accountRepository.deleteAll();
         Account account = new Account()
-                .accountNumber("1111-1111-1111-1111")
-                .pin(new BCryptPasswordEncoder().encode("1234"));
+                .accountNumber(DEFAULT_CARD_NUMBER)
+                .pin(new BCryptPasswordEncoder().encode(DEFAULT_PIN));
         account = accountRepository.save(account);
         return account;
     }
@@ -51,7 +48,7 @@ public class AccountTransactionServiceTest {
 
     @BeforeEach
     public void initTest() {
-        accountTransactionalRepository.deleteAll();
+        accountTransactionRepository.deleteAll();
         accountRepository.deleteAll();
         account = createEntity();
     }
@@ -63,23 +60,23 @@ public class AccountTransactionServiceTest {
         AccountTransaction accountTransaction = generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.DEPOSIT);
         AccountTransaction accountTransaction1 = generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.DEPOSIT);
 
-        assertThat(accountTransactionalService.calculateHash(accountTransaction)).isEqualTo(accountTransactionalService.calculateHash(accountTransaction));
-        assertThat(accountTransactionalService.calculateHash(accountTransaction)).isNotEqualTo(accountTransactionalService.calculateHash(accountTransaction1));
+        assertThat(accountTransactionService.calculateHash(accountTransaction)).isEqualTo(accountTransactionService.calculateHash(accountTransaction));
+        assertThat(accountTransactionService.calculateHash(accountTransaction)).isNotEqualTo(accountTransactionService.calculateHash(accountTransaction1));
     }
 
     @Test
     public void calculateBalanceTest() throws Exception {
         generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.DEPOSIT);
-        assertThat(accountTransactionalService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(10)) == 0);
+        assertThat(accountTransactionService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(10)) == 0);
 
         generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.DEPOSIT);
-        assertThat(accountTransactionalService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(20)) == 0);
+        assertThat(accountTransactionService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(20)) == 0);
 
         generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.WITHDRAWAL);
-        assertThat(accountTransactionalService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(10)) == 0);
+        assertThat(accountTransactionService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(10)) == 0);
 
         generateAccountTransaction(accountRepository.findById(account.getId()).get(), BigDecimal.TEN, TransactionType.WITHDRAWAL);
-        assertThat(accountTransactionalService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(0)) == 0);
+        assertThat(accountTransactionService.calculateBalance(accountRepository.findById(account.getId()).get()).compareTo(BigDecimal.valueOf(0)) == 0);
 
     }
 
@@ -91,9 +88,9 @@ public class AccountTransactionServiceTest {
                 .balance(balance)
                 .amount(amount)
                 .transactionType(transactionType);
-        accountTransactionalRepository.save(accountTransaction);
-        accountTransaction.setHashData(accountTransactionalService.calculateHash(accountTransaction));
-        accountTransactionalRepository.save(accountTransaction);
+        accountTransactionRepository.save(accountTransaction);
+        accountTransaction.setHashData(accountTransactionService.calculateHash(accountTransaction));
+        accountTransactionRepository.save(accountTransaction);
         account.setLastAccountTransaction(accountTransaction);
         accountRepository.save(account);
         return accountTransaction;

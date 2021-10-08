@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -38,6 +39,9 @@ public class Account implements Serializable {
     @Version
     private Long version= 0L;
 
+    @NotNull
+    private ZonedDateTime expiryTime;
+
     public Account accountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
         return this;
@@ -53,6 +57,10 @@ public class Account implements Serializable {
     }
     public Account lastAccountTransaction(AccountTransaction lastAccountTransaction) {
         this.lastAccountTransaction = lastAccountTransaction;
+        return this;
+    }
+    public Account expiryTime(ZonedDateTime expiryTime) {
+        this.expiryTime = expiryTime;
         return this;
     }
 

@@ -1,14 +1,12 @@
 package com.egs.atm.web.rest;
 
 import com.egs.atm.service.AccountService;
-import com.egs.atm.service.AccountTransactionalService;
+import com.egs.atm.service.AccountTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -17,17 +15,17 @@ import java.math.BigDecimal;
  * */
 @RestController
 @RequestMapping("/api")
-public class AccountTransactionalResource {
+public class AccountTransactionResource {
 
-    private final Logger log = LoggerFactory.getLogger(AccountTransactionalResource.class);
+    private final Logger log = LoggerFactory.getLogger(AccountTransactionResource.class);
 
-    private final AccountTransactionalService accountTransactionalService;
+    private final AccountTransactionService accountTransactionService;
     private final AccountService accountService;
 
 
 
-    public AccountTransactionalResource(AccountTransactionalService accountTransactionalService, AccountService accountService) {
-        this.accountTransactionalService = accountTransactionalService;
+    public AccountTransactionResource(AccountTransactionService accountTransactionService, AccountService accountService) {
+        this.accountTransactionService = accountTransactionService;
         this.accountService = accountService;
     }
 
@@ -35,10 +33,10 @@ public class AccountTransactionalResource {
      * rest service for putting some money in account
      * */
     @PostMapping("/account-deposit")
-    public ResponseEntity<BigDecimal> depositAccount(@RequestParam BigDecimal amount) throws Exception {
+    public ResponseEntity<BigDecimal> depositAccount(@RequestHeader MultiValueMap<String, String> headers, @RequestParam BigDecimal amount) throws Exception {
         log.debug("REST request to deposit account : "+ amount +" for card number : "+ accountService.findUsername());
 
-        BigDecimal result = accountTransactionalService.depositAccount(amount);
+        BigDecimal result = accountTransactionService.depositAccount(amount);
         return ResponseEntity.ok(result);
     }
 
@@ -49,7 +47,7 @@ public class AccountTransactionalResource {
     @PostMapping("/account-withdrawal")
     public ResponseEntity<BigDecimal> withdrawalAccount(@RequestParam BigDecimal amount) throws Exception {
         log.debug("REST request to withdrawal account : "+ amount+" for card number : "+ accountService.findUsername());
-        BigDecimal result = accountTransactionalService.withdrawalAccount(amount);
+        BigDecimal result = accountTransactionService.withdrawalAccount(amount);
         return ResponseEntity.ok(result);
     }
 
@@ -59,7 +57,7 @@ public class AccountTransactionalResource {
     @PostMapping("/account-balance")
     public ResponseEntity<BigDecimal> checkBalance() throws Exception {
         log.debug("REST request to  check balance for card number : "+ accountService.findUsername());
-        BigDecimal result =accountTransactionalService.checkBalance();
+        BigDecimal result = accountTransactionService.checkBalance();
         return ResponseEntity.ok(result);
     }
 }

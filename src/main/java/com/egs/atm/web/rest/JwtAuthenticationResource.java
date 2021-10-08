@@ -2,18 +2,19 @@ package com.egs.atm.web.rest;
 
 import com.egs.atm.service.JwtAuthenticationService;
 import com.egs.atm.service.dto.AccountDTO;
+import com.egs.atm.service.dto.LoginRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @CrossOrigin
-public class JwtAuthenticationController {
+public class JwtAuthenticationResource {
 
 
     private final JwtAuthenticationService jwtAuthenticationService;
 
-    public JwtAuthenticationController(JwtAuthenticationService jwtAuthenticationService) {
+    public JwtAuthenticationResource(JwtAuthenticationService jwtAuthenticationService) {
         this.jwtAuthenticationService = jwtAuthenticationService;
     }
 
@@ -21,7 +22,7 @@ public class JwtAuthenticationController {
      * rest service for account authentication
      * */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AccountDTO authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequestDTO authenticationRequest) throws Exception {
 
         return ResponseEntity.ok(jwtAuthenticationService.createAuthenticationToken(authenticationRequest));
     }

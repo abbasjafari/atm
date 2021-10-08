@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ private final AccountRepository accountRepository;
         Optional<Account> accountOptional = accountRepository.findByAccountNumber(username);
         if(accountOptional.isPresent()){
             Account account = accountOptional.get();
-            if (account.getUnsuccessfulCount()>=3) {
+            if (account.getUnsuccessfulCount()>=3 || account.getExpiryTime().compareTo(ZonedDateTime.now())<0) {
                 throw new DisabledException("User is Disabled");
             }
             return new User(account.getAccountNumber(),account.getPin(),

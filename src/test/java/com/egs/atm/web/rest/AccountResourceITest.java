@@ -5,6 +5,7 @@ import com.egs.atm.ATMApp;
 import com.egs.atm.TestUtil;
 import com.egs.atm.domain.Account;
 import com.egs.atm.repository.AccountRepository;
+import com.egs.atm.repository.AccountTransactionRepository;
 import com.egs.atm.service.AccountService;
 import com.egs.atm.service.dto.AccountDTO;
 import com.egs.atm.service.mapper.AccountMapper;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = ATMApp.class)
 public class AccountResourceITest {
 
-    private static final String DEFAULT_CARD_NUMBER = "1111-1111-1111-1111";
-    private static final String UPDATED_CARD_NUMBER = "2222-2222-2222-2222";
+    private static final String DEFAULT_CARD_NUMBER = "0000-0000-0000-0000";
+    private static final String UPDATED_CARD_NUMBER = "1111-1111-1111-1111";
 
     private static final String DEFAULT_PIN = "1234";
     private static final String UPDATED_PIN = "4321";
@@ -49,6 +51,8 @@ public class AccountResourceITest {
 
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private AccountTransactionRepository accountTransactionRepository;
 
     @Autowired
     private AccountMapper accountMapper;
@@ -120,6 +124,8 @@ public class AccountResourceITest {
 
     @BeforeEach
     public void initTest() {
+        accountTransactionRepository.deleteAll();
+        accountRepository.deleteAll();
         account = createEntity(em);
     }
 
@@ -140,7 +146,6 @@ public class AccountResourceITest {
         assertThat(accountList).hasSize(databaseSizeBeforeCreate + 1);
         Account testAccount = accountList.get(accountList.size() - 1);
         assertThat(testAccount.getAccountNumber()).isEqualTo(DEFAULT_CARD_NUMBER);
-        assertThat(testAccount.getPin()).isEqualTo(DEFAULT_PIN);
     }
 
     @Test
@@ -168,7 +173,7 @@ public class AccountResourceITest {
     @Transactional
     public void getAllAccounts() throws Exception {
         // Initialize the database
-        accountRepository.saveAndFlush(account);
+        account=accountRepository.saveAndFlush(account);
 
         // Get all the accountList
         restAccountMockMvc.perform(get("/api/accounts?sort=id,desc"))
@@ -182,7 +187,7 @@ public class AccountResourceITest {
     @Transactional
     public void getAccount() throws Exception {
         // Initialize the database
-        accountRepository.saveAndFlush(account);
+        account=accountRepository.saveAndFlush(account);
 
         // Get the account
         restAccountMockMvc.perform(get("/api/accounts/{id}", account.getId()))
@@ -204,7 +209,7 @@ public class AccountResourceITest {
     @Transactional
     public void updateAccount() throws Exception {
         // Initialize the database
-        accountRepository.saveAndFlush(account);
+        account=accountRepository.saveAndFlush(account);
 
         int databaseSizeBeforeUpdate = accountRepository.findAll().size();
 
@@ -227,7 +232,6 @@ public class AccountResourceITest {
         assertThat(accountList).hasSize(databaseSizeBeforeUpdate);
         Account testAccount = accountList.get(accountList.size() - 1);
         assertThat(testAccount.getAccountNumber()).isEqualTo(UPDATED_CARD_NUMBER);
-        assertThat(testAccount.getPin()).isEqualTo(UPDATED_PIN);
     }
 
     @Test
@@ -253,7 +257,7 @@ public class AccountResourceITest {
     @Transactional
     public void deleteAccount() throws Exception {
         // Initialize the database
-        accountRepository.saveAndFlush(account);
+        account=accountRepository.saveAndFlush(account);
 
         int databaseSizeBeforeDelete = accountRepository.findAll().size();
 

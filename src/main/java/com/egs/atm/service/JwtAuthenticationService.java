@@ -3,6 +3,7 @@ package com.egs.atm.service;
 import com.egs.atm.config.JwtTokenUtil;
 import com.egs.atm.repository.AccountRepository;
 import com.egs.atm.service.dto.AccountDTO;
+import com.egs.atm.service.dto.LoginRequestDTO;
 import com.egs.atm.web.rest.errors.LogicAlertException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,7 +29,7 @@ public class JwtAuthenticationService {
     }
 
 
-    public String createAuthenticationToken(AccountDTO authenticationRequest) throws Exception {
+    public String createAuthenticationToken(LoginRequestDTO authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getAccountNumber(), authenticationRequest.getPin());
 

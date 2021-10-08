@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -38,11 +39,25 @@ public class AccountService {
     /**
      * saving account and encoded password
      * see also {@link AccountDTO}
-     * */
+     */
     public AccountDTO save(AccountDTO accountDTO) {
         log.debug("Request to save Account : {}", accountDTO);
         Account account = accountMapper.toEntity(accountDTO);
-        account.setPin(new BCryptPasswordEncoder().encode(account.getPin()));
+        if (account.getId() != null) {
+            Optional<Account> optionalAccount = accountRepository.findById(account.getId());
+            if (optionalAccount.isPresent()) {
+                account.setLastAccountTransaction(optionalAccount.get().getLastAccountTransaction());
+                if (account.getPin() != null) {
+                    account.setPin(new BCryptPasswordEncoder().encode(account.getPin()));
+                }else {
+                    account.setPin(optionalAccount.get().getPin());
+                }
+            }
+
+        }else
+            account.setPin(new BCryptPasswordEncoder().encode(account.getPin()));
+        if(account.getExpiryTime()==null)
+            account.setExpiryTime(ZonedDateTime.now().plusYears(3));
         account = accountRepository.save(account);
         AccountDTO result = accountMapper.toDto(account);
         return result;
@@ -51,7 +66,7 @@ public class AccountService {
     /**
      * getting all accounts converted to AccountDTO
      * see also {@link AccountDTO}
-     * */
+     */
     @Transactional(readOnly = true)
     public List<AccountDTO> findAll() {
         log.debug("Request to get all Accounts");
@@ -62,7 +77,7 @@ public class AccountService {
 
     /**
      * finding account base on account id
-     * */
+     */
     @Transactional(readOnly = true)
     public Optional<AccountDTO> findOne(Long id) {
         log.debug("Request to get Account : {}", id);
@@ -72,7 +87,7 @@ public class AccountService {
 
     /**
      * deleting account base on account id
-     * */
+     */
     public void delete(Long id) {
         log.debug("Request to delete Account : {}", id);
         accountRepository.deleteById(id);
@@ -81,7 +96,7 @@ public class AccountService {
     /**
      * finding username base on session info and then finding
      * related account by account number
-     * */
+     */
     @Transactional(readOnly = true)
     public Account findAccount() {
         String username = findUsername();
@@ -93,8 +108,8 @@ public class AccountService {
 
     /**
      * getting username from session
-     * */
-    public String findUsername(){
+     */
+    public String findUsername() {
         String username;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
