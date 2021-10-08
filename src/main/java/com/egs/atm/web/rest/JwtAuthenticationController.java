@@ -17,6 +17,9 @@ public class JwtAuthenticationController {
         this.jwtAuthenticationService = jwtAuthenticationService;
     }
 
+    /**
+     * rest service for account authentication
+     * */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AccountDTO authenticationRequest) throws Exception {
 

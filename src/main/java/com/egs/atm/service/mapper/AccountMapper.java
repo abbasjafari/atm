@@ -4,6 +4,10 @@ import com.egs.atm.domain.Account;
 import com.egs.atm.service.dto.AccountDTO;
 import org.mapstruct.Mapper;
 
+/**
+ * AccountMapper using Entity mapper
+ * see {@link AccountDTO} and {@link Account}
+ * */
 @Mapper(componentModel = "spring", uses = {})
 public interface AccountMapper extends EntityMapper<AccountDTO, Account> {
 

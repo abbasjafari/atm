@@ -5,6 +5,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * DTO class relative to {@link com.egs.atm.domain.Account}
+ * */
 @Data
 public class AccountDTO implements Serializable {
 
@@ -12,12 +15,17 @@ public class AccountDTO implements Serializable {
     private String accountNumber;
     private String pin;
 
-
+    /**
+     * set account number using builder pattern
+     * */
     public AccountDTO name(String accountNumber) {
         this.accountNumber = accountNumber;
         return this;
     }
 
+    /**
+     * set account pin using builder pattern
+     * */
     public AccountDTO pin(String pin) {
         this.pin = pin;
         return this;

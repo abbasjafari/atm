@@ -35,6 +35,10 @@ public class AccountService {
     }
 
 
+    /**
+     * saving account and encoded password
+     * see also {@link AccountDTO}
+     * */
     public AccountDTO save(AccountDTO accountDTO) {
         log.debug("Request to save Account : {}", accountDTO);
         Account account = accountMapper.toEntity(accountDTO);
@@ -44,7 +48,10 @@ public class AccountService {
         return result;
     }
 
-
+    /**
+     * getting all accounts converted to AccountDTO
+     * see also {@link AccountDTO}
+     * */
     @Transactional(readOnly = true)
     public List<AccountDTO> findAll() {
         log.debug("Request to get all Accounts");
@@ -53,7 +60,9 @@ public class AccountService {
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
-
+    /**
+     * finding account base on account id
+     * */
     @Transactional(readOnly = true)
     public Optional<AccountDTO> findOne(Long id) {
         log.debug("Request to get Account : {}", id);
@@ -61,12 +70,18 @@ public class AccountService {
                 .map(accountMapper::toDto);
     }
 
+    /**
+     * deleting account base on account id
+     * */
     public void delete(Long id) {
         log.debug("Request to delete Account : {}", id);
         accountRepository.deleteById(id);
     }
 
-
+    /**
+     * finding username base on session info and then finding
+     * related account by account number
+     * */
     @Transactional(readOnly = true)
     public Account findAccount() {
         String username = findUsername();
@@ -75,6 +90,10 @@ public class AccountService {
             return accountOptional.get();
         } else throw new UsernameNotFoundException("User not found with username: " + username);
     }
+
+    /**
+     * getting username from session
+     * */
     public String findUsername(){
         String username;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -7,6 +7,9 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * if incomming request was not valid this exception will be thrown
+ * */
 public class BadRequestAlertException extends AbstractThrowableProblem {
 
     private static final long serialVersionUID = 1L;

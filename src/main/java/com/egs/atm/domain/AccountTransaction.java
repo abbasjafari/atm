@@ -10,6 +10,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
+/**
+ * Entity for Transactions
+ * see also {@link Account}
+ * */
 @Entity
 @Data
 public class AccountTransaction implements Serializable {

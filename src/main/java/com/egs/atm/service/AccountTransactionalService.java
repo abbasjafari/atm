@@ -53,6 +53,9 @@ public class AccountTransactionalService {
         return accountTransaction.getBalance();
     }
 
+    /**
+     * withdraw amount from account
+     * */
     public BigDecimal withdrawalAccount(BigDecimal amount) throws Exception {
         log.debug("request to withdrawal account : "+ amount+" for card number : "+ accountService.findUsername());
 
@@ -76,6 +79,9 @@ public class AccountTransactionalService {
         return accountTransaction.getBalance();
     }
 
+    /**
+     * return current account balance
+     * */
     @Transactional(readOnly = true)
     public BigDecimal checkBalance() throws Exception {
         log.debug(" request to  check balance for card number : "+ accountService.findUsername());
@@ -84,8 +90,11 @@ public class AccountTransactionalService {
 
     }
 
-
-    public BigDecimal calculateBalance(Account account) throws Exception {
+    /**
+     * calculating balance for current user
+     * @throws LogicAlertException
+     * */
+    private BigDecimal calculateBalance(Account account) throws Exception {
         log.debug(" request to  calculate balance for card number : "+ account.getAccountNumber());
         if (account.getLastAccountTransaction() != null) {
             AccountTransaction accountTransaction = account.getLastAccountTransaction();
@@ -96,9 +105,11 @@ public class AccountTransactionalService {
         } else return BigDecimal.ZERO;
     }
 
-
-
-    public String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
+    /**
+     * calculating account transaction hash with md5 algorithm
+     * see also {@link AccountTransaction}
+     * */
+    private String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
         log.debug(" request to  calculate hash for card number : "+ accountTransaction.getAccount().getAccountNumber());
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update((accountTransaction.toString() + accountTransaction.getLastAccountTransactionHash()).getBytes());

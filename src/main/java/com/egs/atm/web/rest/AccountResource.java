@@ -16,6 +16,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Rest services related to Account actions
+ * some methods are {@link #createAccount(AccountDTO)}
+ * some methods are {@link #updateAccount(AccountDTO)}
+ * some methods are {@link #getAllAccounts()}
+ * some methods are {@link #getAccount(Long)}
+ * */
 @RestController
 @RequestMapping("/api")
 public class AccountResource {

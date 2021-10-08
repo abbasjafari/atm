@@ -7,6 +7,10 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * ACCOUNT entity object
+ * see also {@link com.egs.atm.service.dto.AccountDTO}
+ * */
 @Entity
 @Data
 public class Account implements Serializable {

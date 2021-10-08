@@ -1,5 +1,8 @@
 package com.egs.atm.domain.enumration;
 
+/**
+ * Defining transaction type
+ * */
 public enum TransactionType {
     DEPOSIT(1),WITHDRAWAL(-1);
 

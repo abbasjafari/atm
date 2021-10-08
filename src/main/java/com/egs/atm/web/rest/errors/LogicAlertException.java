@@ -1,5 +1,8 @@
 package com.egs.atm.web.rest.errors;
 
+/**
+ * business wrapper exception
+ * */
 public class LogicAlertException extends Exception {
 
     private static final long serialVersionUID = 1L;
