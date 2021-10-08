@@ -3,6 +3,7 @@ package com.egs.atm.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -16,10 +17,12 @@ public class Account implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
+    @NotNull
     private String accountNumber;
 
     @Column
+    @NotNull
     private String pin;
 
     @Column

@@ -4,6 +4,7 @@ import com.egs.atm.domain.enumration.TransactionType;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -20,16 +21,20 @@ public class AccountTransaction implements Serializable {
     private Long id;
 
     @Column
+    @NotNull
     private BigDecimal amount;
 
     @Column
+    @NotNull
     private BigDecimal balance;
 
     @Column
     @Enumerated(EnumType.ORDINAL)
+    @NotNull
     private TransactionType transactionType;
 
     @ManyToOne
+    @NotNull
     private Account account;
 
     @ManyToOne

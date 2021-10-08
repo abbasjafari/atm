@@ -85,8 +85,8 @@ public class AccountTransactionalService {
     }
 
 
-    private BigDecimal calculateBalance(Account account) throws Exception {
-        log.debug(" request to  calculate balance for card number : "+ accountService.findUsername());
+    public BigDecimal calculateBalance(Account account) throws Exception {
+        log.debug(" request to  calculate balance for card number : "+ account.getAccountNumber());
         if (account.getLastAccountTransaction() != null) {
             AccountTransaction accountTransaction = account.getLastAccountTransaction();
             String hash = calculateHash(accountTransaction);
@@ -98,8 +98,8 @@ public class AccountTransactionalService {
 
 
 
-    private String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
-        log.debug(" request to  calculate hash for card number : "+ accountService.findUsername());
+    public String calculateHash(AccountTransaction accountTransaction) throws NoSuchAlgorithmException {
+        log.debug(" request to  calculate hash for card number : "+ accountTransaction.getAccount().getAccountNumber());
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update((accountTransaction.toString() + accountTransaction.getLastAccountTransactionHash()).getBytes());
         byte[] digest = md.digest();

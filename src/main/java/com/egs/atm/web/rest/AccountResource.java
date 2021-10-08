@@ -31,7 +31,6 @@ public class AccountResource {
 
     public AccountResource(AccountService accountService) throws URISyntaxException {
         this.accountService = accountService;
-      createAccount(new AccountDTO().name("1111-1111-1111-1111").pin("1234"));
     }
 
     @PostMapping("/accounts")
