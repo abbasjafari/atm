@@ -13,4 +13,4 @@ spring:
       use-new-id-generator-mappings: false
 
   # drop n create table, good for testing, comment this in production
-      ddl-auto: create
+      ddl-auto: update

@@ -1,6 +1,7 @@
 package com.egs.atm.domain;
 
 import lombok.Data;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import java.util.Objects;
  * */
 @Entity
 @Data
+@Audited
 public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
